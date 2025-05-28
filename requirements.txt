@@ -1,0 +1,13 @@
+streamlit==1.45.0
+fastapi==0.110.0
+joblib==1.4.2
+streamlit_extras
+numpy
+pandas
+scikit-learn
+uvicorn
+openpyxl
+plotly
+python-multipart
+xlsxwriter
+mlflow
