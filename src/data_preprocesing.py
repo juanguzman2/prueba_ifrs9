@@ -7,8 +7,8 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from data_preparation import DataCleaner
-
-selected_features = pd.read_csv('../data\processed\selected_features.csv')['feature'].tolist()
+from config import FEATURES_PATH
+selected_features = pd.read_csv(FEATURES_PATH)['feature'].tolist()
 
 class ModelPreprocessor:
     def __init__(self, target_column='default', apply_cleaning=True,balanceo=True):
@@ -38,9 +38,12 @@ class ModelPreprocessor:
             df = pd.concat([df_majority_downsampled, df_minority])
             df = df.sample(frac=1, random_state=42)
 
-        # Separar X, y
-        y = df[self.target_column]
-        X = df.drop(columns=[self.target_column])
+        if self.target_column in df.columns:
+            y = df[self.target_column]
+            X = df.drop(columns=[self.target_column])
+        else:
+            y = None
+            X = df.copy()
 
         # Columnas
         num_cols = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
