@@ -1,56 +1,31 @@
-# app_streamlit.py
 import streamlit as st
-import pandas as pd
-import requests
-import io
 
-API_URL = "http://127.0.0.1:8000/predict/"
 
-st.title("📊 Clasificador de Riesgo de Crédito")
+st.set_page_config(layout="wide", page_title="Prueba_IFRS9", page_icon=":rocket:")
 
-st.markdown("""
-Carga un archivo `.csv` (separado por pipe `|`) para obtener las probabilidades de incumplimiento y la clasificación en grupos de riesgo `t1` a `t8`.
-""")
+st.title("Juan Esteban Guzmán")
 
-uploaded_file = st.file_uploader("📁 Subir archivo base_prueba.csv", type=["csv"])
+st.sidebar.success("Menú de navegación")
 
-if uploaded_file:
-    if st.button("🚀 Enviar a la API"):
-        with st.spinner("Enviando a la API..."):
-            try:
-                # Enviar archivo a la API
-                files = {'file': (uploaded_file.name, uploaded_file.getvalue())}
-                response = requests.post(API_URL, files=files)
+pages = {
+    # "Carga de archivos": [
+    #     st.Page("paginas/carga_archivos.py", title="Carga de archivos", icon="📤"),
+    #             ],
+    # "Resumen Ejecutivo": [
+    #     st.Page("paginas/visualizacion.py", title="Resumen Ejecutivo", icon="📊"),
+    #             ],
+    "Pronostico certificados invalidos": [
+        st.Page("paginas/predict.py", title="Pronostico certificados invalidos", icon="🤖"),
+                ],
+    # "Desarrollo Técnico": [
+    #     st.Page("paginas/desarollo_tecnico.py", title="Desarrollo Técnico", icon="📚")],
+    # "Ejercicio 2 - Automatización del Reporte": [
+    #     st.Page("paginas/ejercicio_2.py", title="Ejercicio 2 - Automatización del Reporte", icon="⚙️"),
+    #             ],
+    # "Ejercicio 3 - Validación Inteligente de Certificados Médicos": [
+    #     st.Page("paginas/ejercicio_3.py", title="Ejercicio 3 - Validación Inteligente de Certificados Médicos", icon="🧾"),
+    #             ]
+    }
 
-                if response.status_code == 200:
-                    data = response.json()
-                    df_result = pd.DataFrame(data)
-
-                    # Mostrar tabla
-                    st.success("✅ Clasificación completada")
-                    st.dataframe(df_result)
-
-                    # Mostrar resumen
-                    resumen = (
-                        df_result.groupby("grupo_riesgo")
-                        .size()
-                        .reset_index(name="cantidad")
-                        .sort_values(by="grupo_riesgo")
-                    )
-                    st.subheader("📈 Resumen por grupo de riesgo")
-                    st.table(resumen)
-
-                    # Descargar como CSV
-                    csv = df_result.to_csv(index=False).encode("utf-8")
-                    st.download_button(
-                        label="📥 Descargar resultados como CSV",
-                        data=csv,
-                        file_name="predicciones_riesgo.csv",
-                        mime="text/csv"
-                    )
-
-                else:
-                    st.error(f"❌ Error {response.status_code}: {response.json().get('error')}")
-
-            except Exception as e:
-                st.error(f"⚠️ Error al conectar con la API: {e}")
+pg = st.navigation(pages,position="sidebar")
+pg.run()
