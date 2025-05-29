@@ -4,7 +4,7 @@ import pandas as pd
 import requests
 import io
 
-API_URL = "http://127.0.0.1:8000/predict/"
+API_URL = "https://prueba-ifrs9.onrender.com/predict/"
 
 st.title("📊 Clasificador de Riesgo de Crédito")
 
