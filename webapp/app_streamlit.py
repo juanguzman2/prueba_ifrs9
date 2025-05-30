@@ -11,17 +11,9 @@ pages = {
     "Solucion Problema": [
         st.Page("paginas/solucion_problema.py", title="Solucion Problema", icon="📤"),
                 ],
-    "Pronostico certificados invalidos": [
-        st.Page("paginas/predict.py", title="Pronostico certificados invalidos", icon="🤖"),
+    "Pronostico de la probabilidad de default": [
+        st.Page("paginas/predict.py", title="Pronostico de la probabilidad de default", icon="🤖"),
                 ],
-    # "Desarrollo Técnico": [
-    #     st.Page("paginas/desarollo_tecnico.py", title="Desarrollo Técnico", icon="📚")],
-    # "Ejercicio 2 - Automatización del Reporte": [
-    #     st.Page("paginas/ejercicio_2.py", title="Ejercicio 2 - Automatización del Reporte", icon="⚙️"),
-    #             ],
-    # "Ejercicio 3 - Validación Inteligente de Certificados Médicos": [
-    #     st.Page("paginas/ejercicio_3.py", title="Ejercicio 3 - Validación Inteligente de Certificados Médicos", icon="🧾"),
-    #             ]
     }
 
 pg = st.navigation(pages,position="sidebar")

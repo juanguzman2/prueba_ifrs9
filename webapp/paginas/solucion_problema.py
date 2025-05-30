@@ -6,106 +6,173 @@ st.markdown("""
 
 ## 📌 Introducción
 
-Este proyecto tiene como objetivo el desarrollo de un modelo de predicción de incumplimiento de obligaciones financieras para clasificar clientes en ocho grupos de riesgo, definidos según rangos de probabilidad. El modelo se construye a partir de información transaccional y crediticia de clientes con experiencia previa en el sistema financiero, pero bajo uso de canales bancarios.
+Este proyecto tiene como objetivo el desarrollo de un modelo de predicción de incumplimiento de obligaciones financieras para clasificar clientes en ocho grupos de riesgo, definidos según rangos de probabilidad. El modelo se construyó a partir de información transaccional y crediticia de clientes con experiencia previa en el sistema financiero, pero con bajo uso de canales bancarios.
 
 ---
 
 ## 🔍 Objetivo del Proyecto
 
-- Predecir la probabilidad de incumplimiento (`default`) para clientes `objetivo`.
-- Clasificar cada cliente en uno de los grupos [T1-T8] según su PD estimada.
+- Predecir la probabilidad de incumplimiento (`default`) para clientes del tipo `objetivo`.
+- Clasificar cada cliente en uno de los grupos de riesgo [T1–T8] según su PD estimada.
 - Maximizar el porcentaje de población **en rango** por grupo.
-- Evaluar generalización con datos fuera de muestra.
+- Evaluar la capacidad de generalización con datos fuera de muestra.
 
 ---
 
-## Repositorio y Documentación
-Para más detalles sobre el proyecto, puedes consultar el repositorio en [GitHub](https://github.com/juanguzman2/prueba_ifrs9)
-            
-## Ingenieria de Datos
+## 🗂️ Repositorio del Proyecto
+
+Para más detalles técnicos, código fuente y documentación, consulta el repositorio:
+
+🔗 [https://github.com/juanguzman2/prueba_ifrs9](https://github.com/juanguzman2/prueba_ifrs9)
+
+---
+
+## 🧱 Ingeniería de Datos
 
 ### 🔧 Principales Procesos
 
-- **Eliminación de columnas irrelevantes:** remueve identificadores y variables que inducen fuga.
-- **Derivación de variables:** crea nuevas features como `utilizacion_actual`, `relacion_saldo_cupo` o `delta_trx_mes`, útiles para medir señales de riesgo.
-- **Transformación logarítmica:** normaliza distribuciones sesgadas y reduce impacto de valores extremos.
-- **Discretización de variables:** clasifica en categorías como `bajo`, `medio`, `alto` para facilitar reglas de negocio.
-- **Winsorización:** recorte del 10% inferior y superior en variables numéricas para mitigar outliers.
-- **Imputación de valores nulos:** usa mediana, moda o categorías `desconocido`, y añade banderas de imputación.
-- **Eliminación de duplicados y columnas con alta nulidad.**
+- **Eliminación de columnas irrelevantes:** excluye identificadores y variables que inducen fuga de información.
+- **Derivación de variables:** como `utilizacion_actual`, `relacion_saldo_cupo` y `delta_trx_mes`, útiles para capturar señales tempranas de riesgo.
+- **Transformación logarítmica:** aplicada a variables sesgadas para estabilizar su distribución.
+- **Discretización:** clasificación de variables en niveles (`bajo`, `medio`, `alto`) para facilitar reglas de negocio y segmentación.
+- **Winsorización:** recorte del 10% superior e inferior en variables numéricas para mitigar outliers extremos.
+- **Imputación de nulos:** mediante mediana, moda o categoría `desconocido`, con banderas auxiliares para trazabilidad.
+- **Eliminación de duplicados y variables con alta nulidad.**
 
-Todo esta almacenado en la clase Datacleaner en el archivo [data_preparation.py](https://github.com/juanguzman2/prueba_ifrs9/blob/master/src/data_preparation.py)       
+📄 Implementado en la clase `DataCleaner` del archivo [data_preparation.py](https://github.com/juanguzman2/prueba_ifrs9/blob/master/src/data_preparation.py)
+
+---
 
 ## 🧪 Preprocesamiento para Modelado
 
-La clase `ModelPreprocessor` gestiona el flujo completo de transformación de variables antes de entrenar o predecir con modelos de riesgo de crédito.
+La clase `ModelPreprocessor` gestiona todo el flujo de transformación previo al entrenamiento o predicción de modelos.
 
-### 🔧 Funcionalidades Principales
+### Funcionalidades:
 
-- **Limpieza opcional:** aplica el proceso de `DataCleaner` si se activa el parámetro `apply_cleaning=True`.
-- **Separación X / y:** identifica la variable objetivo (`default`) y separa las variables predictoras.
-- **Transformación numérica:**
-  - Imputación de valores nulos con mediana.
-  - Escalado con `StandardScaler` para normalizar magnitudes.
-- **Transformación categórica:**
-  - Imputación con la moda.
-  - Codificación One-Hot (`OneHotEncoder`).
+- **Limpieza opcional:** mediante `DataCleaner` (`apply_cleaning=True`).
+- **Transformación de variables:**
+  - Numéricas: imputación con mediana + escalado (`StandardScaler`)
+  - Categóricas: imputación con moda + codificación (`OneHotEncoder`)
+- **Manejo de columnas invisibles:** asegura consistencia entre entrenamiento y validación.
+- **Control de `inf` y columnas faltantes.**
 
 ### ⚖️ Balanceo de Clases
 
-Se encontro un gran desbalanceo de datos en la clase objetivo `Defaul`. Por lo tanto se opto por aplicar un balanceo de clases durante el entrenamiento del modelo.
+Se detectó un desbalance severo en la clase `default`. Para solucionarlo:
 
-Durante el entrenamiento, si `balanceo=True`, aplica una combinación:
-- **Undersampling** con `RandomUnderSampler`.
-- **Oversampling** con `SMOTE`.
+- **Undersampling** con `RandomUnderSampler`
+- **Oversampling** con `SMOTE`
 
-Esto ayuda a mejorar el aprendizaje sobre la clase minoritaria (`default = 1`).
+✔️ Aplicado solo en entrenamiento (`fit=True`) para evitar sesgo en validación.
 
-Todo esta almacenado en la clase ModelPreprocessor en el archivo [model_preprocessor.py](https://github.com/juanguzman2/prueba_ifrs9/blob/master/src/data_preprocesing.py)
+📄 Implementado en la clase `ModelPreprocessor` del archivo [model_preprocessor.py](https://github.com/juanguzman2/prueba_ifrs9/blob/master/src/data_preprocesing.py)
+
+---
 
 ## 🤖 Selección y Entrenamiento del Modelo
+
+Se aplicó un proceso robusto de experimentación, validación y selección del mejor modelo utilizando `MLflow`.
+
+### 🔁 Flujo de trabajo
+
+1. **Preprocesamiento:** usando `ModelPreprocessor` sobre `base_train.csv`
+2. **Evaluación de modelos base:**
+   - Logistic Regression
+   - Random Forest
+   - XGBoost
+   - LightGBM
+3. **Optimización:**
+   - `GridSearchCV` con validación cruzada (3 folds)
+   - Métrica objetivo: `F1-score`
+4. **Registro en MLflow:**
+   - Almacena hiperparámetros, métricas (`F1`, `Precision`, `Recall`, `AUC`) y artefactos serializados
+
+### 📊 Comparación de Modelos: Preselección vs Optimización
+
+| Modelo                 | F1 Score | Precisión | Recall |
+|------------------------|----------|-----------|--------|
+| LogisticRegression_HPO | 0.54     | 0.42      | 0.74   |
+| RandomForest_HPO       | 0.54     | 0.47      | 0.62   |
+| XGBoost_HPO            | **0.55** | **0.44**  | **0.75** |
+| LightGBM_HPO           | 0.54     | 0.43      | 0.70   |
+| **XGBoost_Optimized**  | 0.54     | 0.43      | 0.75   |
+
+✅ **XGBoost Optimizado** fue seleccionado como modelo final por su desempeño balanceado y estabilidad con datos fuera de muestra (201901).
+
+El modelo fue almacenado en un archivo `.pkl` para su uso posterior. La ubicacion del modelo es: [Model.pkl](https://github.com/juanguzman2/prueba_ifrs9/blob/master/models/model.pkl)
+
+📈 Visualización de MLflow:
+![MLflow Results](https://github.com/juanguzman2/prueba_ifrs9/blob/master/images/MLFlow.png?raw=true)
+
+---
+
+## 🔮 API de Predicción de Riesgo de Crédito
+
+Una vez entrenado el modelo final, se implementó una API REST para consumo externo.
+
+### 📥 Endpoint: `/predict/`
+
+- **Método:** `POST`
+- **Tipo de contenido:** `multipart/form-data`
+- **Parámetro:** `file` — archivo `.csv` separado por `|` con la misma estructura de variables del entrenamiento.
+
+📄 Lógica implementada en el archivo [app.py](https://github.com/juanguzman2/prueba_ifrs9/blob/master/api/app.py)
+
+---
+
+### 🧠 Lógica Interna de Predicción
+
+La API utiliza la clase `RiskPredictor` para realizar todo el flujo de predicción, que incluye:
+
+1. **Carga del modelo serializado** desde disco (`model.pkl`) usando `joblib`.
+2. **Transformación de los datos** de entrada con una instancia del `ModelPreprocessor` (sin rebalanceo en producción).
+3. **Predicción de probabilidad de incumplimiento** (`y_proba = model.predict_proba(X)[:, 1]`).
+4. **Asignación de grupo de riesgo** (`t1` a `t8`) usando reglas basadas en rangos de PD definidos por negocio.
+5. **Validación de que todas las predicciones caen en un grupo permitido**.
+
+📄 Código fuente: [`predict.py`](https://github.com/juanguzman2/prueba_ifrs9/blob/master/src/predict.py)
+
+---
+
+### 📤 Respuesta esperada (formato JSON)
+
+```json
+[
+  {
+    "num_doc": "12345678",
+    "probabilidad": 0.0324,
+    "grupo_riesgo": "t4"
+  },
+  ...
+]
+```
+
+---
+
+## 📌 Recomendaciones y Datos Adicionales
+
+Para mejorar aún más la efectividad del modelo, sería ideal incorporar:
+
+- **Datos de scoring externos** (Buró de crédito)
+- **Variables socioeconómicas** del cliente (ciudad, ingresos)
+- **Datos temporales o secuenciales** (historial mensual de mora)
+- **Alertas tempranas** en canales alternos (APPs, call center)
+- **Variables macroeconómicas** (tasas de interés, inflación)
+
+📉 Estos datos podrían obtenerse con bajo costo si ya forman parte del core transaccional o CRM de la entidad.
+
             
+## 🧩 Estrategia Teórica para Disponibilizar el Modelo
 
-Para seleccionar el mejor modelo predictivo se aplicó un enfoque sistemático con validación, optimización de hiperparámetros y registro de resultados usando **MLflow**.
+Para facilitar el consumo del modelo por servicios externos o usuarios finales, se plantea la siguiente solución teórica:
 
-### ⚙️ Flujo de trabajo
+- El modelo entrenado se **serializa en formato `.pkl`** para garantizar su reutilización y trazabilidad.
+- Se expone una **API REST construida con FastAPI**, que permite recibir archivos de entrada (`.csv`) y retornar las predicciones de riesgo (`grupo_riesgo`).
+- Para mejorar la interacción, se puede desarrollar una **interfaz web en FastAPI o Streamlit** que permita a usuarios cargar archivos, visualizar resultados y descargar reportes de clasificación.
 
-1. **Carga y transformación de datos**:
-   - Se aplicó el `ModelPreprocessor` para limpiar, transformar y balancear la data (`base_train.csv`).
-   - Los datos fueron divididos en `train` y `test` con `stratify` para mantener la proporción de la clase objetivo (`default`).
+Este enfoque asegura que los resultados del modelo sean fácilmente accesibles por sistemas web, móviles o procesos de negocio automatizados sin necesidad de redearrollar el modelo.
 
-2. **Modelos evaluados**:
-   - `Logistic Regression`
-   - `Random Forest`
-   - `XGBoost`
-   - `LightGBM`
-
-3. **Optimización de hiperparámetros**:
-   - Se utilizó `GridSearchCV` con validación cruzada de 3 folds y métrica objetivo `F1-score`.
-   - Para el modelo final (`Random Forest`), se aplicó una grilla extendida con combinaciones avanzadas de parámetros como `max_depth`, `min_samples_split`, `max_features`, etc.
-
-4. **Registro con MLflow**:
-   - Cada experimento se registró con nombre, parámetros, métricas (`F1`, `Precision`, `Recall`, `AUC`) y el modelo serializado para reutilización.
-
-### 📈 Mejores Resultados en Validación
-
-Modelo final entrenado: **Random Forest Optimizado**
-
-Métricas en fuera de muestra 201901 (`base_prueba.csv`):
-
-- **F1-score**: `0.53`
-- **Precision**: `0.47`
-- **Recall**: `0.60`
-- **AUC**: `0.76`
-
-imagen de mlflow
-![MLflow Results](https://github.com/juanguzman2/prueba_ifrs9/blob/master/imgs/MLFlow.png)
-
-## API de Predicción
-            
-            
-
-
-            
 """
+            
+           
             )

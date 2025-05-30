@@ -40,13 +40,25 @@ if uploaded_file:
                     st.subheader("📈 Resumen por grupo de riesgo")
                     st.table(resumen)
 
-                    # Descargar como CSV
+                    # Descargar predicciones como CSV
                     csv = df_result.to_csv(index=False).encode("utf-8")
                     st.download_button(
                         label="📥 Descargar resultados como CSV",
                         data=csv,
                         file_name="predicciones_riesgo.csv",
                         mime="text/csv"
+                    )
+
+                    # Descargar resumen como Excel usando BytesIO
+                    output = io.BytesIO()
+                    resumen.to_excel(output, index=False, engine='openpyxl')
+                    output.seek(0)
+
+                    st.download_button(
+                        label="📥 Descargar resumen como Excel",
+                        data=output,
+                        file_name="resumen_riesgo.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     )
 
                 else:
