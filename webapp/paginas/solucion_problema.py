@@ -91,20 +91,19 @@ Para seleccionar el mejor modelo predictivo se aplicó un enfoque sistemático c
 
 Modelo final entrenado: **Random Forest Optimizado**
 
-Métricas en muestra de validación (`base_validacion.csv`):
+Métricas en fuera de muestra 201901 (`base_prueba.csv`):
 
 - **F1-score**: `0.53`
 - **Precision**: `0.47`
 - **Recall**: `0.60`
 - **AUC**: `0.76`
 
-### 🧪 Validación Final
+imagen de mlflow
+![MLflow Results](https://github.com/juanguzman2/prueba_ifrs9/blob/master/imgs/MLFlow.png)
 
-Se aplicó el modelo a la muestra de enero 2019 usando el preprocesador ya entrenado (`fit=False`) para simular condiciones de producción. Esto garantiza consistencia y generalización del pipeline.
-
-Este proceso asegura la selección del mejor modelo bajo restricciones de balanceo, interpretabilidad y desempeño esperadas en el contexto de riesgo de crédito.
-
-
+## API de Predicción
+            
+            
 
 
             
