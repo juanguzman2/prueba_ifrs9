@@ -8,12 +8,9 @@ st.title("Juan Esteban Guzmán")
 st.sidebar.success("Menú de navegación")
 
 pages = {
-    # "Carga de archivos": [
-    #     st.Page("paginas/carga_archivos.py", title="Carga de archivos", icon="📤"),
-    #             ],
-    # "Resumen Ejecutivo": [
-    #     st.Page("paginas/visualizacion.py", title="Resumen Ejecutivo", icon="📊"),
-    #             ],
+    "Solucion Problema": [
+        st.Page("paginas/solucion_problema.py", title="Solucion Problema", icon="📤"),
+                ],
     "Pronostico certificados invalidos": [
         st.Page("paginas/predict.py", title="Pronostico certificados invalidos", icon="🤖"),
                 ],
