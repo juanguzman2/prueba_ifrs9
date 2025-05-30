@@ -1,12 +1,22 @@
-# src/preprocessing/model_preprocessor.py
+
 
 import pandas as pd
-from sklearn.utils import resample
+import numpy as np
+
+
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
+from sklearn.utils import resample
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.feature_selection import SelectFromModel
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
 from data_preparation import DataCleaner
+
+
 from config import FEATURES_PATH
 selected_features = pd.read_csv(FEATURES_PATH)['feature'].tolist()
 
@@ -20,12 +30,10 @@ class ModelPreprocessor:
         self.feature_names_out = None
 
     def transform(self, df: pd.DataFrame) -> tuple:
-        # ✅ Limpieza solo si está activada (entrenamiento)
         if self.apply_cleaning:
             cleaner = DataCleaner()
             df = cleaner.clean(df)
 
-        # Balanceo (solo si entrenamos modelo)
         if self.balanceo:
             df_majority = df[df[self.target_column] == 0]
             df_minority = df[df[self.target_column] == 1]
@@ -45,11 +53,9 @@ class ModelPreprocessor:
             y = None
             X = df.copy()
 
-        # Columnas
         num_cols = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
         cat_cols = X.select_dtypes(include=['object', 'category']).columns.tolist()
 
-        # Pipelines
         num_pipe = Pipeline([
             ('imputer', SimpleImputer(strategy='median')),
             ('scaler', StandardScaler())
@@ -72,14 +78,6 @@ class ModelPreprocessor:
         X_df = X_df.loc[:, X_df.columns.intersection(selected_features)]
         return X_df, y
 
-
-# src/features/feature_selector.py
-
-import pandas as pd
-import numpy as np
-from sklearn.linear_model import LogisticRegression
-from sklearn.feature_selection import SelectFromModel
-from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 class FeatureSelector:
     def __init__(self, vif_threshold=10, corr_threshold=0.8):

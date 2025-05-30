@@ -68,6 +68,17 @@ Se detectó un desbalance severo en la clase `default`. Para solucionarlo:
 📄 Implementado en la clase `ModelPreprocessor` del archivo [model_preprocessor.py](https://github.com/juanguzman2/prueba_ifrs9/blob/master/src/data_preprocesing.py)
 
 ---
+            
+## 🧮 Selección de Características
+
+Para optimizar el modelo y reducir colinealidad, se aplicó una combinación de técnicas:
+
+- 🔗 **Correlación**: se eliminaron variables con correlación > 0.80 para evitar redundancias.
+- 📉 **VIF** (Variance Inflation Factor): se descartaron variables con VIF > 10 para controlar la multicolinealidad.
+- 🔍 **Lasso (L1)**: se entrenó una regresión logística penalizada para seleccionar únicamente variables relevantes.
+- 🌲 **Importancia con Random Forest**: se identificaron las 30 variables más importantes para la predicción, visualizadas con un gráfico de barras.
+
+Este proceso mejoró la eficiencia del modelo y su capacidad de generalización.            
 
 ## 🤖 Selección y Entrenamiento del Modelo
 

@@ -18,7 +18,6 @@ if uploaded_file:
     if st.button("🚀 Enviar a la API"):
         with st.spinner("Enviando a la API..."):
             try:
-                # Enviar archivo a la API
                 files = {'file': (uploaded_file.name, uploaded_file.getvalue())}
                 response = requests.post(API_URL, files=files)
 
@@ -26,11 +25,9 @@ if uploaded_file:
                     data = response.json()
                     df_result = pd.DataFrame(data)
 
-                    # Mostrar tabla
                     st.success("✅ Clasificación completada")
                     st.dataframe(df_result)
 
-                    # Mostrar resumen
                     resumen = (
                         df_result.groupby("grupo_riesgo")
                         .size()
@@ -40,7 +37,6 @@ if uploaded_file:
                     st.subheader("📈 Resumen por grupo de riesgo")
                     st.table(resumen)
 
-                    # Descargar predicciones como CSV
                     csv = df_result.to_csv(index=False).encode("utf-8")
                     st.download_button(
                         label="📥 Descargar resultados como CSV",
@@ -49,7 +45,6 @@ if uploaded_file:
                         mime="text/csv"
                     )
 
-                    # Descargar resumen como Excel usando BytesIO
                     output = io.BytesIO()
                     resumen.to_excel(output, index=False, engine='openpyxl')
                     output.seek(0)

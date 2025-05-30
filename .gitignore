@@ -2,3 +2,4 @@ env/
 mlruns/
 __pycache__/
 mlartifacts/
+mlflow.db

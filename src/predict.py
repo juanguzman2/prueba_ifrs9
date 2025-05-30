@@ -1,4 +1,3 @@
-# src/prediction/predictor.py
 
 import pandas as pd
 import joblib
@@ -6,7 +5,7 @@ import joblib
 class RiskPredictor:
     def __init__(self, model_path, preprocessor, feature_file=None):
         self.model_path = model_path
-        self.preprocessor = preprocessor  # instancia ya creada del preprocesador
+        self.preprocessor = preprocessor  
         self.model = self._load_model()
         self.feature_file = feature_file
 
@@ -34,23 +33,18 @@ class RiskPredictor:
             return 'fuera_rango'
 
     def predict(self, input_path):
-        # 1. Cargar datos
         df = pd.read_csv(input_path, sep='|', encoding='utf-8')
 
-        # 2. Transformar datos
         X, _ = self.preprocessor.transform(df)
 
-        # 3. Predicción
         y_proba = self.model.predict_proba(X)[:, 1]
 
-        # 4. Construcción de resultados
         df_result = pd.DataFrame({
             'num_doc': df.loc[X.index, 'num_doc'].values,
             'probabilidad': y_proba
         })
         df_result['grupo_riesgo'] = df_result['probabilidad'].apply(self._asignar_grupo)
 
-        # 5. Validación
         assert df_result['grupo_riesgo'].isin([
             't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8'
         ]).all(), "❌ Hay categorías fuera de rango"
